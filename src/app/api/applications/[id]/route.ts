@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { sendDirectMessage } from '@/lib/discord-bot'
 import { isAdmin } from '@/lib/auth'
-import DiscordClient from "@/lib/add-whitelist-role/discord-client";
+import DiscordClient from "@/lib/custom-code/discord-client";
 
 type Application = {
   id: string

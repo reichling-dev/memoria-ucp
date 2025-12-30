@@ -1,4 +1,4 @@
-﻿import type { GuildMember } from './models.js'
+﻿import type {Embed, GuildMember} from './models.js'
 
 class DiscordClient {
     private readonly baseUrl: string = 'https://discord.com/api/v10'
@@ -39,6 +39,17 @@ class DiscordClient {
                 body: JSON.stringify({ roles: roles }),
             }
         )
+    }
+
+    async sendMessageWithEmbedOnly(channelId: string, embed: Embed): Promise<void> {
+        await fetch(`${this.baseUrl}/channels/${channelId}/messages`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ embeds: [embed] }),
+        })
     }
 }
 
