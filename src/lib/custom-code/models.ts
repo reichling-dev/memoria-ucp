@@ -1,11 +1,5 @@
-﻿interface Embed {
-    color: string
-    title: string
-    description: string
-}
-
-interface GuildMember {
+﻿interface GuildMember {
     roles: string[]
 }
 
-export { Embed, GuildMember }
+export { GuildMember }

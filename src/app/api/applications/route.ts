@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
 import DiscordClient from "@/lib/custom-code/discord-client";
-import { Embed } from "@/lib/custom-code/models";
 
 const dataFilePath = path.join(process.cwd(), 'data', 'applications.json')
 
@@ -20,14 +19,6 @@ if (!DISCORD_CHANNEL_ID) {
 }
 
 const discordClient = new DiscordClient(DISCORD_SERVER_ID, DISCORD_TOKEN)
-
-async function buildNotifyEmbed(): Promise<Embed> {
-  return {
-    color: '#0092b8',
-    title: 'Neuer Whitelistantrag!',
-    description: 'Ein neuer Whitelistantrag ist eingegangen. Arbeite du Sklave!',
-  };
-}
 
 export async function POST(req: Request) {
   try {
@@ -49,9 +40,9 @@ export async function POST(req: Request) {
 
     await fs.writeFile(dataFilePath, JSON.stringify(applications, null, 2))
 
-    const embed = await buildNotifyEmbed()
     try {
-      await discordClient.sendMessageWithEmbedOnly(DISCORD_CHANNEL_ID, embed)
+      await discordClient.sendMessageWithContentOnly(DISCORD_CHANNEL_ID, 'Ein neuer Whitelist-Antrag ist eingegangen.')
+      await discordClient.sendMessageWithContentOnly(DISCORD_CHANNEL_ID, 'https://tenor.com/view/richard-attenborough-whip-whipped-whiplash-whiplashed-gif-16685949900343051341')
     } catch (error) {
       console.error('Failed to send Discord notification:', error)
     }
