@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { sendDirectMessage } from '@/lib/discord-bot'
 import { isAdmin } from '@/lib/auth'
+import DiscordClient from "@/lib/add-whitelist-role/discord-client";
 
 type Application = {
   id: string
@@ -31,6 +32,38 @@ type Application = {
 
 const dataFilePath = path.join(process.cwd(), 'data', 'applications.json')
 const archiveFilePath = path.join(process.cwd(), 'data', 'archived_applications.json')
+
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN
+if (!DISCORD_TOKEN) {
+  throw new Error('Missing required environment variable DISCORD_TOKEN!')
+}
+const DISCORD_SERVER_ID = process.env.DISCORD_SERVER_ID
+if (!DISCORD_SERVER_ID) {
+  throw new Error('Missing required environment variable DISCORD_SERVER_ID!')
+}
+const DISCORD_ROLE_ID = process.env.DISCORD_ROLE_ID
+if (!DISCORD_ROLE_ID) {
+  throw new Error('Missing required environment variable DISCORD_ROLE_ID!')
+}
+
+const discordClient = new DiscordClient(DISCORD_SERVER_ID, DISCORD_TOKEN)
+
+async function addWhitelistRole(userId: string) {
+  const guildMember = await discordClient.getGuildMember(userId)
+  if (!guildMember) {
+    console.error(`User ${userId} not found in guild`)
+    return
+  }
+
+  const roles = guildMember.roles
+  if (roles.includes(DISCORD_ROLE_ID)) {
+    console.log(`User ${userId} already has the whitelist role`)
+    return
+  }
+  roles.push(DISCORD_ROLE_ID)
+
+  await discordClient.patchGuildMemberRoles(userId, roles)
+}
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -73,6 +106,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
     archivedApplications.push(updatedApplication)
     await fs.writeFile(archiveFilePath, JSON.stringify(archivedApplications, null, 2))
+
+    try {
+      await addWhitelistRole(updatedApplication.discord.id)
+    } catch (e) {
+      console.error('Failed to add whitelist role to user:', e)
+    }
 
     let discordMessageSent = false
     try {
