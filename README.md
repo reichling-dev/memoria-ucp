@@ -156,3 +156,12 @@ For issues, feature requests, or general inquiries, please open an issue on the 
 ---
 
 Thank you for using Aura-applications! We hope this system enhances your FiveM server's whitelist process.
+
+## License Notice
+
+Aura-applications is licensed under the GPL-3.0 license. By using this software, you agree to the terms of the license.
+
+## Copyright Notice
+
+Aura-applications is written by [auradevelopment5m](https://github.com/auradevelopment5m). All rights belong to them.
+Thanks a lot for the amazing work!
